@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import java.util.Arrays;
-import java.util.List;
 
 @SpringBootApplication
 @EnableWebFluxSecurity
@@ -25,14 +24,15 @@ public class WebFluxSecurityDemoApplication {
     public MapReactiveUserDetailsService userDetailsService() {
         UserDetails test = User.withDefaultPasswordEncoder().username("test").password("test").roles("USER", "ADMIN").build();
         UserDetails ynz = User.withDefaultPasswordEncoder().username("ynz").password("ynz").roles("USER").build();
-        List<UserDetails> users = Arrays.asList(test, ynz);
-        return new MapReactiveUserDetailsService(users);
+        return new MapReactiveUserDetailsService(Arrays.asList(test, ynz));
     }
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) {
         return httpSecurity.authorizeExchange().pathMatchers("/hello").permitAll()
-                .anyExchange().hasRole("ADMIN").and().httpBasic().and().build();
+                .anyExchange().hasRole("ADMIN")
+                .and().httpBasic()
+                .and().build();
     }
 
 }
