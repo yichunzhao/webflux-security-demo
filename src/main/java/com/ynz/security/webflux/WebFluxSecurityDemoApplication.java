@@ -8,6 +8,8 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import java.util.Arrays;
@@ -21,9 +23,17 @@ public class WebFluxSecurityDemoApplication {
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public MapReactiveUserDetailsService userDetailsService() {
-        UserDetails test = User.withDefaultPasswordEncoder().username("test").password("test").roles("USER", "ADMIN").build();
-        UserDetails ynz = User.withDefaultPasswordEncoder().username("ynz").password("ynz").roles("USER").build();
+        UserDetails test = User.builder().passwordEncoder(passwordEncoder()::encode).username("test")
+                .password("test").roles("USER", "ADMIN").build();
+        UserDetails ynz = User.builder().passwordEncoder(passwordEncoder()::encode).username("ynz")
+                .password("ynz").roles("USER").build();
+
         return new MapReactiveUserDetailsService(Arrays.asList(test, ynz));
     }
 
